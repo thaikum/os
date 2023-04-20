@@ -29,13 +29,14 @@ void spool_enqueue(FILE *fp, int pid)
 spool_item *front(){
 	return spool_head;
 }
+
 void spool_dequeue()
 {
 	spool_item *o_head = spool_head;
+
 	if (spool_head)
 	{
 		spool_head = spool_head->next;
-		fclose(spool_head->fp);
 		free(spool_head);
 	}
 }

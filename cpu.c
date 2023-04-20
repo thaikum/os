@@ -64,9 +64,9 @@ void cpu_execute_instruction(void) {
             break;
         case PRINT:
             printf("AC: %d", reg->AC);
-	    char str[10];
-	    sprintf(str, "%d", reg->AC);
-	    print_print(str, reg->PID);
+            char str[10];
+            sprintf(str, "%d", reg->AC);
+            print_print(str, reg->PID);
             break;
         case SLEEP:
             sleep(readMemory());
@@ -76,8 +76,8 @@ void cpu_execute_instruction(void) {
             break;
         case EXIT:
             reg->exec_status = 0;
-	    print_terminate();
-	    process_exit(reg->PID);
+            print_end_spool(reg->PID);
+            process_exit(reg->PID);
             break;
         default:
             reg->exec_status = 0;
@@ -91,6 +91,9 @@ void cpu_execute_instruction(void) {
 * cpu_operation - executes commands in a loop
 */
 void cpu_operation(void) {
+    if (reg->PID != 1) //do not initialize spool for idle process
+        print_init_spool(reg->PID);
+
     while (reg->exec_status) {
         cpu_fetch_instruction();
         cpu_execute_instruction();

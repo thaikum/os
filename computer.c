@@ -1,4 +1,5 @@
 #include "main.h"
+#include <sys/wait.h>
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -33,4 +34,7 @@ int main()
 	mem_init(size);
 	init_idle_process();
 	shell_init();
+
+    print_terminate();
+//    wait(NULL);
 }

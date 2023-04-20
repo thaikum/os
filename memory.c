@@ -12,11 +12,14 @@ extern cpu_reg *reg;
  */
 void mem_init(int size)
 {
+    int x;
+
 	mem_size = size;
 	Mem = calloc(size, sizeof(int));
 
 	if (!Mem)
 		exit(100);
+
 }
 
 /**
@@ -36,7 +39,19 @@ int readMemory()
  */
 void writeMemory()
 {
+    printf("\n");
 	Mem[reg->MAR] = reg->AC;
+}
+
+/**
+ * clear_memory - clears previously allocated memory
+ */
+ void clear_memory(int start, int size)
+{
+	 int x;
+
+	 for (x = start; x < size; x++)
+		 Mem[x] = 0;
 }
 
 /**

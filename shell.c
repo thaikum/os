@@ -5,6 +5,55 @@
 extern cpu_reg *reg;
 extern int mem_size;
 extern int *Mem;
+extern q_item *readyQ_head;
+extern q_item *PCBs_head;
+
+/**
+ * load_finish - cleans up and close the program file
+ * @param f: the file to close
+*/
+void load_finish(FILE *f)
+{
+	fclose(f);
+}
+
+/**
+ * load_prog - loads a program into the memory
+ * @param fname: the program file
+ * @param base: the memory offset
+*/
+int load_prog(char *fname, int base)
+{
+	FILE *fp;
+	int i_len, d_len, len, x;
+
+	if (base > mem_size)
+	{
+		fprintf(stderr, "invalid base\n");
+		clean();
+		exit(98);
+	}
+
+	fp = fopen(fname, "r");
+	if (!fp)
+	{
+		fprintf(stderr, "Cannot read file %s\n", fname);
+		clean();
+		exit(98);
+	}
+
+	fscanf(fp, "%d", &i_len);
+	fscanf(fp, "%d", &d_len);
+	len = (i_len * 2) + d_len + base;
+
+	for (x = base; x < len; x++)
+	{
+		fscanf(fp, "%d", &Mem[x]);
+	}
+
+	load_finish(fp);
+	return (len);
+}
 
 /**
  * shell_print_registers - prints register values
@@ -25,9 +74,23 @@ void shell_print_memory(void)
 {
 	int x = 0;
 
-	for (; x < mem_size; x++){
+	for (; x < mem_size; x++)
+	{
 		printf("%d ", Mem[x]);
 	}
+	printf("\n");
+}
+
+void submit()
+{
+	char file_name[50];
+	int base, no_of_words;
+
+	printf("Enter the file name followed by the base: ");
+	scanf("%s %d", file_name, &base);
+
+	no_of_words = load_prog(file_name, base);
+	process_submit(file_name, base, no_of_words);
 }
 
 /**
@@ -35,34 +98,32 @@ void shell_print_memory(void)
  */
 void shell_command(int cmd)
 {
-	char *file_name = NULL;
-	int base;
+
 
 	switch (cmd)
 	{
 	case 0:
 		exit(0);
 	case 1:
-//		printf("Enter the file name followed by the base: \n");
-//		scanf("%s\n%d", file_name, &base);
-//		process_submit(file_name, base);
+		submit();
 		break;
 	case 2:
 		shell_print_registers();
 		break;
 	case 3:
+		shell_print_memory();
 		break;
 	case 4:
-//		process_dump_readyQ();
+		process_dump_PCBs();
 		break;
 	case 5:
+		process_dump_readyQ();
 		break;
 	case 6:
-		break;
-	case 9:
-		shell_print_registers();
+		//todo implement spool
 		break;
 	default:
+		fprintf(stderr, "Invalid command\n");
 		break;
 	}
 }

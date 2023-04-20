@@ -64,15 +64,20 @@ void cpu_execute_instruction(void) {
             break;
         case PRINT:
             printf("AC: %d", reg->AC);
+	    char str[10];
+	    sprintf(str, "%d", reg->AC);
+	    print_print(str, reg->PID);
             break;
         case SLEEP:
             sleep(readMemory());
             break;
         case SHELL:
-            //todo execute shell command
+            shell_command(reg->IR1);
             break;
         case EXIT:
             reg->exec_status = 0;
+	    print_terminate();
+	    process_exit(reg->PID);
             break;
         default:
             reg->exec_status = 0;

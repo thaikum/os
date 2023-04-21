@@ -34,7 +34,6 @@ int main()
 	mem_init(size);
 	init_idle_process();
 	shell_init();
-
-    print_terminate();
-//    wait(NULL);
+	print_terminate();
+	wait(NULL);
 }

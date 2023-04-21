@@ -181,12 +181,13 @@ void process_execute()
 {
 	PCB *pcb;
 
-	while(readyQ_head){
+	while (readyQ_head)
+	{
 		pcb = process_fetch_readyQ();
 
 		if (!pcb)
 		{
-			//todo execute idle process
+			goto idle;
 		}
 		else
 		{
@@ -194,9 +195,10 @@ void process_execute()
 		}
 	}
 
+    idle:
 	pcb = get_process_by_id(1, PCBs_head); //get the idle process
 	process_context_switch(pcb);
-//	cpu_operation();
+	cpu_operation();
 }
 
 /**
@@ -218,9 +220,10 @@ void process_exit(int pid)
 /**
  * init_idle_process - initializes idle process into the system
  */
-void init_idle_process(){
+void init_idle_process()
+{
 	int idle_base = 0;
-	int instructions[] = {6,0};
+	int instructions[] = { 6, 0 };
 	Mem[0] = instructions[0];
 	Mem[1] = instructions[1];
 	process_init_PCB("idle process", idle_base, 2);

@@ -80,7 +80,7 @@ void printer_dump_spool()
 
 void printer_print(int pid)
 {
-	char *buff = malloc(6);
+    char *buff;
 	size_t size;
 	FILE *fp;
 
@@ -89,8 +89,11 @@ void printer_print(int pid)
 	{
 		buff = malloc(size);
 
+        printf("Size is: %lu", size);
 		if (read(data_spool_pipe[READ], buff, size))
 		{
+            printf("string is: %s\n", buff);
+
 
 			fp = find_spool_by_pid(pid);
 
@@ -101,7 +104,6 @@ void printer_print(int pid)
 		}
 		free(buff);
 	}
-	close(data_spool_pipe[READ]);
 };
 
 void printer_terminate()
@@ -176,4 +178,5 @@ void printer_main()
 		}
 	}
 	close(new_spool_pipe[READ]);
+    close(data_spool_pipe[READ]);
 }

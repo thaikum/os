@@ -1,9 +1,10 @@
 #ifndef MAIN_H
 #define MAIN_H
 
-#define EXECUTING 1;
-#define READY 2;
-#define WAITING 3;
+#define EXECUTING 1
+#define READY 2
+#define WAITING 3
+#define COMPLETED 4
 
 typedef struct cpu_reg
 {
@@ -50,26 +51,15 @@ void remove_by_pid(int, q_item **, q_item **);
 
 PCB *get_process_by_id(int pid, q_item *);
 
-void init();
-
-/* scheduler.c */
-//void process_init_PCBs(int number_of_processes);
-//void process_init_PCB(char *file_name);
-//void process_dispose_PCB();
 void process_dump_PCBs();
 
 void init_idle_process();
 
-//void process_init_readyQ();
-//void process_insert_readyQ();
-//PCB *process_fetch_readyQ();
 void process_dump_readyQ();
 
-//void process_context_switch();
-//void process_init();
 void process_submit(char *file_name, int base, int prog_len);
 
-void process_execute();
+void *process_execute();
 
 void process_exit(int pid);
 
@@ -87,7 +77,7 @@ void clean();
 
 
 /* load functions */
-int load_prog(char *fname, int base);
+int load_prog(char *, int base);
 
 
 /* cpu */
@@ -97,18 +87,17 @@ void cpu_operation();
 /* shell */
 void shell_command(int cmd);
 
-void shell_init(void);
+void *shell_init(void);
 
 /* computer */
-void process_set_registers(void);
+void clean_registers();
 
 /* print */
 void print_init();
 void send_data(int action, int pid);
-void print_init();
 void print_init_spool(int pid);
 void print_end_spool(int pid);
 void print_terminate();
-void print_print(char *buf, int pid);
+void print_print(int, int pid);
 
 #endif

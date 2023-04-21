@@ -1,6 +1,7 @@
 #include "main.h"
 #include <stdio.h>
 #include <unistd.h>
+#include <stdlib.h>
 
 #define LOAD_C 1
 #define LOAD 2
@@ -15,6 +16,7 @@
 
 extern cpu_reg *reg;
 extern int *Mem;
+extern pthread_mutex_t sh;
 
 /**
  * cpu_mem_address - calculates the physical memory address
@@ -64,9 +66,8 @@ void cpu_execute_instruction(void) {
             break;
         case PRINT:
             printf("AC: %d", reg->AC);
-            char str[10];
-            sprintf(str, "%d", reg->AC);
-            print_print(str, reg->PID);
+
+            print_print(reg->AC, reg->PID);
             break;
         case SLEEP:
             sleep(readMemory());
@@ -75,13 +76,13 @@ void cpu_execute_instruction(void) {
             shell_command(reg->IR1);
             break;
         case EXIT:
-            reg->exec_status = 0;
             print_end_spool(reg->PID);
             process_exit(reg->PID);
+            reg->exec_status = COMPLETED;
             break;
         default:
             reg->exec_status = 0;
-            fprintf(stderr, "Invalid command encountered %d", reg->IR1);
+            fprintf(stderr, "Invalid command encountered %d\n", reg->IR0);
             break;
     }
     reg->PC += 2;
@@ -91,11 +92,6 @@ void cpu_execute_instruction(void) {
 * cpu_operation - executes commands in a loop
 */
 void cpu_operation(void) {
-    if (reg->PID != 1) //do not initialize spool for idle process
-        print_init_spool(reg->PID);
-
-    while (reg->exec_status) {
         cpu_fetch_instruction();
         cpu_execute_instruction();
-    }
 }

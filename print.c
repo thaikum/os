@@ -4,8 +4,6 @@
 #include <string.h>
 #include "printer.h"
 
-int child = 1;
-
 int printer_ack_pipe[2];
 int new_spool_pipe[2];
 int data_spool_pipe[2];
@@ -71,17 +69,19 @@ void print_terminate()
 {
 	send_data(TERMINATE, 0);
     close(new_spool_pipe[WRITE]);
+    close(data_spool_pipe[WRITE]);
 }
 
-void print_print(char *buf, int pid)
+void print_print(int buf, int pid)
 {
-	size_t buf_len = strlen(buf);
+    char str[9] ;
+    sprintf(str, "%d", buf);
+	size_t buf_len = strlen(str);
     send_data(PRINT, pid);
 
 	close(data_spool_pipe[READ]);
 	write(data_spool_pipe[WRITE], &buf_len, sizeof(size_t));
-	write(data_spool_pipe[WRITE], buf, buf_len + 1);
-	close(data_spool_pipe[WRITE]);
-
+	write(data_spool_pipe[WRITE], str, buf_len + 1);
+//	close(data_spool_pipe[WRITE]);
 }
 

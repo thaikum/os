@@ -65,8 +65,7 @@ void cpu_execute_instruction(void) {
             reg->PC = reg->IR1 - 2;
             break;
         case PRINT:
-            printf("AC: %d", reg->AC);
-
+            printf("AC: %d\n", reg->AC);
             print_print(reg->AC, reg->PID);
             break;
         case SLEEP:
@@ -78,7 +77,6 @@ void cpu_execute_instruction(void) {
         case EXIT:
             print_end_spool(reg->PID);
             process_exit(reg->PID);
-            reg->exec_status = COMPLETED;
             break;
         default:
             reg->exec_status = 0;

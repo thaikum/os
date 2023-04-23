@@ -20,6 +20,8 @@ void mem_init(int size)
 	if (!Mem)
 		exit(100);
 
+    printf("Memory of size %d initialized\n", size);
+
 }
 
 /**

@@ -93,7 +93,13 @@ void remove_spool_by_pid(int pid)
 void print_all_spools()
 {
 	spool_item *n_head = spool_head;
-	for (; n_head; n_head = n_head->next){
-		printf("PID: %d\n", n_head->pid);
-	}
+
+    if (spool_head){
+        for (; n_head; n_head = n_head->next){
+            printf("PID: %d\n", n_head->pid);
+        }
+    }else{
+        printf("The spool is empty\n");
+    }
+
 }

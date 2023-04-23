@@ -5,7 +5,7 @@
 #include "spool_ds.h"
 #define PRINTER_OUTPUT "printer.out"
 
-
+extern const int PT;
 /**
  * printer_init_spool - opens a spool file with the pid.spool
  * @param pid - file to open.
@@ -32,7 +32,6 @@ void *printer_init_spool(int pid)
 void printer_init(void)
 {
 	int done = 1;
-	int pid;
 	FILE *fp;
 
 	close(printer_ack_pipe[READ]);
@@ -71,6 +70,7 @@ void printer_end_spool(int pid)
 	fclose(printer_output);
 	remove(file_name);
 	remove_spool_by_pid(pid);
+    printf("Done printing for process %d\n", pid);
 }
 
 void printer_dump_spool()
@@ -80,29 +80,15 @@ void printer_dump_spool()
 
 void printer_print(int pid)
 {
-    char *buff;
 	size_t size;
 	FILE *fp;
+    int val;
 
 	close(data_spool_pipe[WRITE]);
-	if (read(data_spool_pipe[READ], &size, sizeof(size_t)))
+	if (read(data_spool_pipe[READ], &val, sizeof(int)))
 	{
-		buff = malloc(size);
-
-        printf("Size is: %lu", size);
-		if (read(data_spool_pipe[READ], buff, size))
-		{
-            printf("string is: %s\n", buff);
-
-
-			fp = find_spool_by_pid(pid);
-
-			if (fp)
-			{
-				fprintf(fp, "%s ", buff);
-			}
-		}
-		free(buff);
+        fp = find_spool_by_pid(pid);
+        fprintf(fp, "%d ", val);
 	}
 };
 
@@ -146,8 +132,8 @@ void printer_terminate()
 
 void printer_main()
 {
+    sleep(PT);
 	int sig[2];
-	FILE *fp;
 
 	printer_init();
 
@@ -155,6 +141,7 @@ void printer_main()
 
 	while (read(new_spool_pipe[READ], sig, sizeof(sig)))
 	{
+        sleep(PT);
 		switch (sig[0])
 		{
 		case INIT_SPOOL:
@@ -162,7 +149,6 @@ void printer_main()
 			break;
 		case END_SPOOL:
 			printer_end_spool(sig[1]);
-
 			break;
 		case DUMP_SPOOL:
 			printer_dump_spool();

@@ -94,7 +94,6 @@ void shell_command(int cmd) {
     switch (cmd) {
         case 0:
             terminate_flag = 1;
-//		exit(0);
         case 1:
             submit();
             break;
@@ -111,14 +110,13 @@ void shell_command(int cmd) {
             process_dump_readyQ();
             break;
         case 6:
-            //todo implement spool
+            printer_dump_spool();
             break;
         default:
             fprintf(stderr, "Invalid command\n");
             break;
     }
 }
-
 /**
 * shell_init - initializes the shell
 */

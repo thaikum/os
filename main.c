@@ -1,16 +1,19 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include "main.h"
 #include <unistd.h>
 #include <sys/wait.h>
 
 int main(){
-    print_init();
+    q_item *head = NULL;
+    q_item *tail = NULL;
 
-    char tt[] = "hello";
-    print_init_spool(30);
-    print_print(tt, 30);
-//    print_end_spool(30);
-    print_terminate();
-    wait(NULL);
-    return (0);
+    PCB *pcb = malloc(1 * sizeof(q_item));
+    pcb->pid = 1;
+
+    enqueue(pcb, &head, &tail);
+    printf("queue status: %d\n", !!head);
+    dequeue(&head);
+//    remove_by_pid(1, &head, &tail);
+    printf("queue status: %d\n", !!head);
 }

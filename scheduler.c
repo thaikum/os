@@ -1,4 +1,3 @@
-#include <stdarg.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include "main.h"
@@ -11,11 +10,11 @@ extern int *Mem;
 
 int global_pid = 1; //keeps track of the latest pid
 
-q_item *PCBs_head;
-q_item *PCBs_tail;
+q_item *PCBs_head = NULL;
+q_item *PCBs_tail = NULL;
 
-q_item *readyQ_head;
-q_item *readyQ_tail;
+q_item *readyQ_head = NULL;
+q_item *readyQ_tail = NULL;
 
 q_item *temp_item;
 
@@ -52,6 +51,7 @@ PCB *process_init_PCB(char *file_name, int base, int prog_len) {
     pcb->exec_status = READY;
 
     global_pid++;
+
     enqueue(pcb, &PCBs_head, &PCBs_tail);
 
     return (pcb);
@@ -93,7 +93,8 @@ void process_insert_readyQ(PCB *pcb) {
 void process_context_switch(PCB *n_pcb) {
     PCB *old_pcb = get_process_by_id(reg->PID, PCBs_head);
 
-    if (old_pcb) {
+    if (old_pcb && old_pcb->pid != 1) {
+        printf("Process %d out with a PC of: %d\n", old_pcb->pid, reg->PC);
         old_pcb->IR1 = reg->IR1;
         old_pcb->MDR = reg->MDR;
         old_pcb->IR0 = reg->IR0;
@@ -101,9 +102,11 @@ void process_context_switch(PCB *n_pcb) {
         old_pcb->pc = reg->PC;
         old_pcb->MAR = reg->MAR;
         old_pcb->exec_status = WAITING;
+        process_insert_readyQ(old_pcb);
     }
 
     if (n_pcb) {
+        printf("Process %d in with a PC of: %d\n", old_pcb->pid, reg->PC);
         reg->IR1 = n_pcb->IR1;
         reg->MAR = n_pcb->MAR;
         reg->MDR = n_pcb->MDR;
@@ -118,28 +121,21 @@ void process_context_switch(PCB *n_pcb) {
 
 /**
  * process_fetch_readyQ - fetches a process to execute from the ready queue
+ * This function uses fetches in the FIFO approach.
+ * This covers the round robin apart from the time quantum that is implemented in teh process_execute method
  */
 PCB *process_fetch_readyQ() {
-    // todo figure out how to implement the round robin
-    if (temp_item) {
-        free(temp_item);
-        temp_item = NULL;
-    }
-
-    if (readyQ_head) {
-        dequeue(&readyQ_head, &temp_item);
-
-        process_context_switch(temp_item->pcb);
-        return (temp_item ? temp_item->pcb : NULL);
-    }
-    return (NULL);
+    return (dequeue(&readyQ_head, &readyQ_tail)->pcb);
 }
 
 /**
  * process_dump_readyQ - prints all the processes in the readyQ
  */
 void process_dump_readyQ() {
-    print_all_pids(readyQ_head);
+    if (readyQ_head)
+        print_all_pids(readyQ_head);
+    else
+        printf("The ready queue is empty\n");
 }
 
 
@@ -160,29 +156,34 @@ void process_submit(char *file_name, int base, int prog_len) {
 
     process_insert_readyQ(pcb);
     print_init_spool(pcb->pid);
-    //todo print_init_spool
 }
 
 /**
 * process_execute - executes a process
 */
 void *process_execute() {
-    int no_of_execution = 0;
+    int no_of_execution = 0; //for implementing the round-robin
     PCB *pcb;
 
     init_idle_process();
 
     while (terminate_flag != 1) {
-        if (readyQ_head && no_of_execution >= TQ) {
+
+        if (readyQ_head && (no_of_execution >= TQ || reg->exec_status == COMPLETED)) {
             pcb = process_fetch_readyQ();
-            process_context_switch(pcb);
+
+            if (pcb != NULL)
+                process_context_switch(pcb);
+
             no_of_execution = 0;
         } else if (!readyQ_head && reg->exec_status == COMPLETED) {
             pcb = get_process_by_id(1, PCBs_head);
             process_context_switch(pcb);
+            printf("CPU is currently idle\n");
         }
+
         cpu_operation();
-        no_of_execution++;
+        no_of_execution = no_of_execution > TQ ? 0 : no_of_execution + 1;
     }
 
     print_terminate();
@@ -194,12 +195,14 @@ void *process_execute() {
 * process_exit - exits a process
 */
 void process_exit(int pid) {
-    PCB *p = get_process_by_id(pid, readyQ_head);
+    PCB *p = get_process_by_id(pid, PCBs_head);
     if (p) {
+        printf("Process %d completed execution\n", reg->PID);
+        clean_registers();
         clear_memory(p->Base, p->no_of_words);
-        free(p);
+
         remove_by_pid(pid, &PCBs_head, &PCBs_tail);
-        remove_by_pid(pid, &readyQ_head, &readyQ_tail);
+        free(p);
     }
     //todo remember to print spool
 }
@@ -212,5 +215,5 @@ void init_idle_process() {
     int instructions[] = {6, 0};
     Mem[0] = instructions[0];
     Mem[1] = instructions[1];
-    process_init_PCB("idle process", idle_base, 2);
+    process_init_PCB("idle process", idle_base, 1);
 }

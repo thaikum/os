@@ -63,7 +63,6 @@ void *process_execute();
 
 void process_exit(int pid);
 
-
 /* memory functions */
 void mem_init(int size);
 
@@ -99,5 +98,8 @@ void print_init_spool(int pid);
 void print_end_spool(int pid);
 void print_terminate();
 void print_print(int, int pid);
+
+/* printer */
+void printer_dump_spool();
 
 #endif

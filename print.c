@@ -17,20 +17,20 @@ void send_data(int action, int pid) {
 
 }
 
-void listen_for_acknowledgement(){
-    int ack;
-
-    close(printer_ack_pipe[WRITE]);
-
-    if (read(printer_ack_pipe[READ], &ack, sizeof(int)) == -1) {
-        fprintf(stderr, "couldn't read");
-        exit(72);
-    } else {
-        printf("printer started successfully\n");
-    }
-    close(printer_ack_pipe[READ]);
-    return;
-}
+//void listen_for_acknowledgement(){
+//    int ack;
+//
+//    close(printer_ack_pipe[WRITE]);
+//
+//    if (read(printer_ack_pipe[READ], &ack, sizeof(int)) == -1) {
+//        fprintf(stderr, "couldn't read");
+//        exit(72);
+//    } else {
+//        printf("printer started successfully\n");
+//    }
+//    close(printer_ack_pipe[READ]);
+//    return;
+//}
 
 
 /**
@@ -53,8 +53,8 @@ void print_init() {
     } else if (id == 0) {
         printer_main();
     } else {
-       pthread_t t;
-        pthread_create(&t, NULL, (void *(*)(void *)) &listen_for_acknowledgement, NULL);
+//       pthread_t t;
+//        pthread_create(&t, NULL, (void *(*)(void *)) &listen_for_acknowledgement, NULL);
     }
 }
 

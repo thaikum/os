@@ -1,4 +1,4 @@
-#include "main.h"
+#include "computer.h"
 #include <sys/wait.h>
 #include <pthread.h>
 #include <stdlib.h>

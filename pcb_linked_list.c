@@ -1,4 +1,4 @@
-#include "main.h"
+#include "computer.h"
 #include <stdlib.h>
 #include <stdio.h>
 

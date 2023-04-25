@@ -1,6 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
-#include "main.h"
+#include "computer.h"
 
 extern const int TQ;
 int terminate_flag = 0;
@@ -204,7 +204,6 @@ void process_exit(int pid) {
         remove_by_pid(pid, &PCBs_head, &PCBs_tail);
         free(p);
     }
-    //todo remember to print spool
 }
 
 /**

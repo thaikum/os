@@ -1,4 +1,4 @@
-#include "main.h"
+#include "computer.h"
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -78,7 +78,7 @@ void submit() {
     int base, no_of_words;
     pthread_t t;
 
-    printf("\nEnter the file name followed by the base: ");
+    printf("Enter the file name followed by the base: ");
     scanf("%s %d", file_name, &base);
 
     no_of_words = load_prog(file_name, base);

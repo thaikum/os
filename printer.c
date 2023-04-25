@@ -39,6 +39,7 @@ void printer_init(void)
 	write(printer_ack_pipe[WRITE], &done, sizeof(int));
 	close(printer_ack_pipe[WRITE]);
 	fclose(fp);
+    printf("printer started successfully\n");
 }
 
 void printer_end_spool(int pid)

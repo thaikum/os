@@ -102,4 +102,6 @@ void print_print(int, int pid);
 /* printer */
 void printer_dump_spool();
 
+int list_len(q_item *q_head);
+
 #endif

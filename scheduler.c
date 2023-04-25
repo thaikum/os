@@ -16,8 +16,6 @@ q_item *PCBs_tail = NULL;
 q_item *readyQ_head = NULL;
 q_item *readyQ_tail = NULL;
 
-q_item *temp_item;
-
 /**
  * process_init_PCBs - initializes several PCBs
  * @param number_of_processes - number of processes to initialize
@@ -91,8 +89,8 @@ void process_insert_readyQ(PCB *pcb) {
  * @direction: i if in and o if out
  */
 void process_context_switch(PCB *n_pcb) {
+    printf("================= Context switching ======================\n");
     PCB *old_pcb = get_process_by_id(reg->PID, PCBs_head);
-
     if (old_pcb && old_pcb->pid != 1) {
         printf("Process %d out with a PC of: %d\n", old_pcb->pid, reg->PC);
         old_pcb->IR1 = reg->IR1;
@@ -106,7 +104,8 @@ void process_context_switch(PCB *n_pcb) {
     }
 
     if (n_pcb) {
-        printf("Process %d in with a PC of: %d\n", old_pcb->pid, reg->PC);
+        printf("Process %d in with a PC of: %d\n", n_pcb->pid, n_pcb->pc);
+
         reg->IR1 = n_pcb->IR1;
         reg->MAR = n_pcb->MAR;
         reg->MDR = n_pcb->MDR;
@@ -117,6 +116,7 @@ void process_context_switch(PCB *n_pcb) {
         reg->Base = n_pcb->Base;
         reg->exec_status = EXECUTING;
     }
+    printf("==================================================\n");
 }
 
 /**
@@ -165,9 +165,8 @@ void *process_execute() {
     int no_of_execution = 0; //for implementing the round-robin
     PCB *pcb;
 
-    init_idle_process();
-
     while (terminate_flag != 1) {
+
 
         if (readyQ_head && (no_of_execution >= TQ || reg->exec_status == COMPLETED)) {
             pcb = process_fetch_readyQ();

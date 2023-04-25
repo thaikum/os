@@ -3,6 +3,7 @@
 #include <pthread.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <strings.h>
 
 cpu_reg *reg;
 int PT;
@@ -25,7 +26,7 @@ void process_init_registers(void)
     clean_registers();
 }
 
-int main()
+int main(int argc, char *argv[])
 {
 	FILE *fp = fopen("config.sys", "r");
 	int size;
@@ -45,6 +46,28 @@ int main()
 	print_init();
 	process_init_registers();
 	mem_init(size);
+
+    init_idle_process();
+    if (argc == 2){
+        fp = fopen(argv[1], "r");
+        char file[30];
+        char *line = malloc(35);
+        size_t len = 7;
+        int base;
+        int words;
+
+        while(getline(&line, &len, fp) != EOF){
+            sscanf(line, "%s%d", file, &base);
+            words = load_prog(file, base);
+            if (words > 0){
+                process_submit(file, base, words);
+            }
+            bzero(file, 30);
+            bzero(line, 35);
+        }
+        free(line);
+        fclose(fp);
+    }
 
     pthread_create(&shell, NULL, (void *(*)(void *)) &shell_init, NULL);
 	process_execute();

@@ -1,0 +1,2 @@
+sample2.txt 50
+sample1.txt 9

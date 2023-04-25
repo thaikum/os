@@ -23,9 +23,11 @@ q_item *enqueue(PCB *pcb, q_item **q_head, q_item **q_tail) {
     }
 
     new_item->pcb = pcb;
+    new_item->next = NULL;
 
     if (!!*q_head) {
         (*q_tail)->next = new_item;
+        *q_tail = new_item;
     } else {
         *q_head = new_item;
         *q_tail = new_item;
@@ -82,6 +84,7 @@ PCB *get_process_by_id(int pid, q_item *q_head) {
             return (cur_item->pcb);
         }
     }
+
     return (NULL);
 }
 

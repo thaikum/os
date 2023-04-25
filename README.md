@@ -10,6 +10,15 @@ Process
 2. Type make on the terminal
 3. type make run - to run the generated computer.exe
 
+You might want to start the program with some initial processes
+1. Create a file in the project directory
+2. the file should have a format 
+        <program_file> <base>
+3. You can include as many programs as possible
+4. run ./computer.exe <file_name> where file ame is the name of the file you created on 1 above
+5. This will help to show how context switching is being performed
+**A sample file is provided as program_list.txt**
+
 Project input
 =======================
 The project prints a couple of lines to indicate processes happening in the background
